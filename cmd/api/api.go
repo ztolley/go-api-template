@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -11,10 +12,14 @@ import (
 
 type APIServer struct {
 	addr string
+	db   *sql.DB
 }
 
-func NewAPIServer(addr string) *APIServer {
-	return &APIServer{addr: addr}
+func NewAPIServer(addr string, db *sql.DB) *APIServer {
+	return &APIServer{
+		addr: addr,
+		db:   db,
+	}
 }
 
 func (s *APIServer) Run() {
@@ -22,7 +27,7 @@ func (s *APIServer) Run() {
 	router := http.NewServeMux()
 
 	// Create a user store, that provides a repository to access user data
-	userStore := user.NewStore()
+	userStore := user.NewStore(s.db)
 
 	// Create a new handler service for user related requests, pass it a reference
 	// to the user store so it can make database repository calls then register the

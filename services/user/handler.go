@@ -9,7 +9,7 @@ import (
 
 /**
 *
-* User Handler/Router
+* User Request Handler
 *
 * This is the main route handler for requests to /users
 * It has a reference to the user store, so it can make database calls
@@ -30,7 +30,13 @@ func (h *Handler) RegisterRoutes(router *http.ServeMux) {
 }
 
 func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
-	users := h.store.GetUsers()
+	users, err := h.store.GetUsers()
+
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	utils.WriteJSON(w, http.StatusOK, users)
 }
 
@@ -44,7 +50,12 @@ func (h *Handler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := h.store.GetUserByID(userIDInt)
+	user, err := h.store.GetUserByID(userIDInt)
+
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
 
 	utils.WriteJSON(w, http.StatusOK, user)
 }

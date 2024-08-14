@@ -12,6 +12,6 @@ type User struct {
 }
 
 type UserStore interface {
-	GetUsers() []User
-	GetUserByID(id int) User
+	GetUsers() ([]*User, error)
+	GetUserByID(id int) (*User, error)
 }

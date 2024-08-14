@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"database/sql"
@@ -6,13 +6,10 @@ import (
 	"log"
 
 	_ "github.com/lib/pq"
-
-	"github.com/ztolley/goapi/cmd/api"
 	"github.com/ztolley/goapi/configs"
 )
 
-func main() {
-
+func NewPostgresStore() (*sql.DB, error) {
 	connStr := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
 		configs.Envs.DBUser,
@@ -27,17 +24,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	initStorage(db)
-
-	server := api.NewAPIServer(":8080", db)
-	server.Run()
-}
-
-func initStorage(db *sql.DB) {
-	err := db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("DB: Successfully connected!")
+	return db, nil
 }
