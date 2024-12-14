@@ -8,9 +8,19 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/ztolley/goapi/cmd/api"
-	"github.com/ztolley/goapi/configs"
+	"github.com/ztolley/goapi/internal/configs"
 )
 
+// @title User API
+// @version 1.0
+// @description This is a sample server for a user API.
+
+// @contact.name Zac Tolley
+// @contact.url https://exsite.dev
+// @contact.email ztolley@exsiteconsultants.com
+
+// @license.name MIT
+// @BasePath /
 func main() {
 
 	connStr := fmt.Sprintf(

@@ -5,9 +5,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ztolley/goapi/services/auth"
-	"github.com/ztolley/goapi/services/user"
-	"github.com/ztolley/goapi/utils"
+	"github.com/ztolley/goapi/internal/auth"
+	"github.com/ztolley/goapi/internal/docs"
+	"github.com/ztolley/goapi/internal/user"
+	"github.com/ztolley/goapi/internal/utils"
 )
 
 type APIServer struct {
@@ -26,17 +27,28 @@ func (s *APIServer) Run() {
 	// Use the new server router added in Go 1.22
 	router := http.NewServeMux()
 
-	// Create a user store, that provides a repository to access user data
-	userStore := user.NewStore(s.db)
-
 	// Create a new handler service for user related requests, pass it a reference
 	// to the user store so it can make database repository calls then register the
 	// routes it will handle
-	userHandler := user.NewHandler(userStore)
+	userHandler := user.NewHandler(user.NewStore(s.db))
 	userHandler.RegisterRoutes(router)
 
-	// Define the middleware chain for all requests
-	middlewareChain := MiddlewareChain(utils.RequestLoggerMiddleware, auth.WithJWTAuth)
+	// Create a handler for OpenAPI documentation and Swagger UI
+	docs.RegisterRoutes(router)
+
+	// Define the routes to exclude from JWT authentication
+	// and create a new JWT authentication middleware with the excluded routes
+	excludedRoutes := []string{
+		"/openapi.yaml",
+		"/openapi.json",
+		"/swagger/",
+		"/favicon.ico",
+	}
+
+	authMiddleware := auth.WithJWTAuth(excludedRoutes)
+
+	// Define the middleware chain for all requests to include logging and authentication
+	middlewareChain := MiddlewareChain(utils.RequestLoggerMiddleware, authMiddleware)
 
 	// Setup the web server, this is a mixture of routes, middleare and the
 	// address to listen on for requests

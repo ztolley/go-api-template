@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ztolley/goapi/utils"
+	"github.com/ztolley/goapi/internal/utils"
 )
 
 /**
@@ -27,8 +27,17 @@ func NewHandler(store UserStore) *Handler {
 func (h *Handler) RegisterRoutes(router *http.ServeMux) {
 	router.HandleFunc("GET /users", h.GetUsers)
 	router.HandleFunc("GET /users/{userID}", h.GetUserByID)
+
 }
 
+// GetUsers godoc
+// @Summary Get all users from the database
+// @Description Get all users from the db
+// @Tags users
+// @Accept  json
+// @Produce  json
+// @Success 200 {array} User
+// @Router /users [get]
 func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := h.store.GetUsers()
 
@@ -40,6 +49,15 @@ func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	utils.WriteJSON(w, http.StatusOK, users)
 }
 
+// GetUserByID godoc
+// @Summary Get a user by ID
+// @Description Get a user by ID
+// @Tags users
+// @Accept  json
+// @Produce  json
+// @Param userID path int true "User ID"
+// @Success 200 {object} User
+// @Router /users/{userID} [get]
 func (h *Handler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	userID := r.PathValue("userID")
 
@@ -58,4 +76,8 @@ func (h *Handler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.WriteJSON(w, http.StatusOK, user)
+}
+
+func (h *Handler) ServeOpenAPISpec(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "openapi.yaml")
 }

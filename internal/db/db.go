@@ -6,7 +6,7 @@ import (
 	"log"
 
 	_ "github.com/lib/pq"
-	"github.com/ztolley/goapi/configs"
+	"github.com/ztolley/goapi/internal/configs"
 )
 
 func NewPostgresStore() (*sql.DB, error) {
